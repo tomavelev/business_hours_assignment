@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Business Place</title>
+</head>
+<body>
+<div th:if="${business != null}">
+    <h1 th:text="${business.displayed_what}"></h1>
+    <h2 th:text="${business.displayed_where}"></h2>
+    <ul>
+        <li th:each="group : ${business.opening_hours.daysGroup}">
+
+            <span th:if="${group.daysOfTheWeek.size() == 1}">
+                 <span th:text="${daysOfTheWeek.get(group.daysOfTheWeek.get(0))}"></span>
+            </span>
+
+            <span th:if="${group.daysOfTheWeek.size() > 1}">
+                 From <span th:text="${daysOfTheWeek.get(group.daysOfTheWeek.get(0))}"></span>
+                To <span th:text="${daysOfTheWeek.get(group.daysOfTheWeek.get( group.daysOfTheWeek.size()-1 ))}"></span>
+            </span>
+
+            <ul>
+                <li th:each="hour : ${group.hours}">
+                    <span th:text="${hour.type}"></span>
+                    <span th:text="${hour.start}"></span>
+                    <span th:text="${hour.end}"></span>
+                </li>
+            </ul>
+        </li>
+
+    </ul>
+</div>
+<div th:if="${business == null}">
+    Provide Valid business ID
+</div>
+
+
+</body>
+</html>
