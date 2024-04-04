@@ -10,10 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 
 @Service
 public class BusinessLocationService {
@@ -47,10 +46,12 @@ public class BusinessLocationService {
         pairs.put(3, body.getOpening_hours().getDays().getWednesday());
         pairs.put(4, body.getOpening_hours().getDays().getThursday());
         pairs.put(5, body.getOpening_hours().getDays().getFriday());
+        pairs.put(6, body.getOpening_hours().getDays().getSaturday());
+        pairs.put(7, body.getOpening_hours().getDays().getSunday());
 
         DaysGroup group = null;
 
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= 7; i++) {
             List<WorkingHour> workingHours = pairs.get(i);
             if (workingHours != null) {
                 if (group == null) {
@@ -62,7 +63,6 @@ public class BusinessLocationService {
                     if (group.getHours().equals(workingHours)) {
                         group.getDaysOfTheWeek().add(i);
                     } else {
-                        body.getOpening_hours().getDaysGroup().add(group);
                         group = new DaysGroup();
                         group.getDaysOfTheWeek().add(i);
                         group.setHours(workingHours);
@@ -72,6 +72,44 @@ public class BusinessLocationService {
             } else {
                 if (group != null) {
                     group = null;
+                }
+            }
+        }
+    }
+
+    public void isOpenNow(PlaceLocalEntry placeLocalEntry) {
+        Calendar timeNow = Calendar.getInstance();
+        timeNow.setTime(new Date());
+
+        int dayOfWeek = timeNow.get(Calendar.DAY_OF_WEEK);
+        List<WorkingHour> workingHoursForCurrentDay = placeLocalEntry.getWorkingHours(dayOfWeek);
+
+        LocalTime now = LocalTime.now();
+
+//        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        if (!workingHoursForCurrentDay.isEmpty()) {
+            for (WorkingHour workingHour : workingHoursForCurrentDay) {
+                if (workingHour.getType().equals("OPEN")) {
+                    String start = workingHour.getStart();
+                    String end = workingHour.getEnd();
+                    try {
+                        LocalTime fromDate = LocalTime.parse(start);
+                        LocalTime endDate = LocalTime.parse(end);
+
+
+//                        timeNow after fromDate
+//                        &&
+//                        timeNow before endDate
+
+                        if (now.isAfter(fromDate) && now.isBefore(endDate)) {
+                            placeLocalEntry.setOpenNow(true);
+                        }
+                        break;
+                    } catch (DateTimeParseException e) {
+
+                        // report to internal team that the origin data is corrupted
+//                        throw new RuntimeException(e);
+                    }
                 }
             }
         }

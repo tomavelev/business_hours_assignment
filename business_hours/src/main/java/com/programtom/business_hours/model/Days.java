@@ -7,5 +7,7 @@ public class Days {
     private java.util.List<WorkingHour> thursday;
     private java.util.List<WorkingHour> friday;
     private java.util.List<WorkingHour> monday;
+    private java.util.List<WorkingHour> saturday;
+    private java.util.List<WorkingHour> sunday;
 
 }

@@ -34,6 +34,8 @@ public class BusinessLocationController {
         daysOfTheWeek.put(3, "Wednesday");
         daysOfTheWeek.put(4, "Thursday");
         daysOfTheWeek.put(5, "Friday");
+        daysOfTheWeek.put(6, "Saturday");
+        daysOfTheWeek.put(7, "Sunday");
         businessPlaceView.addObject("daysOfTheWeek", daysOfTheWeek);
 
 
